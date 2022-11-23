@@ -1,5 +1,5 @@
 import scrapy
-import pandas 
+import pandas as pd
 from indicadores.items import Producto
 from indicadores.PropertieController import *
 from indicadores.DBUpDown import *
@@ -8,23 +8,27 @@ load_dotenv()
 
 countries = eval(get_countries())
 retailers = eval(get_retailers())
-dataframe = GetDataFrame('product_homologated','psql_read').get_dataframe
-dataframe = dataframe[dataframe['PAIS'].isin(countries)]
-dataframe = dataframe[dataframe['RETAILER'].isin(retailers)]
-print (dataframe)
+#dataframe = GetDataFrame('product_homologated','psql_read').get_dataframe # crawling > retail_information -- homologados > product_homologated
+#dataframe.to_csv('product.csv', index=False)
+dataframe = pd.read_csv("product.csv")
+dataframe = dataframe[dataframe['PAIS'].isin(countries)] # country - PAIS
+dataframe = dataframe[dataframe['RETAILER'].isin(retailers)] # retail - RETAILER
+#for i, df in dataframe.iterrows():
+    #print (df['URL'])
+    
 
 class EconomicIndicators(scrapy.Spider):
     """ Spider para obtener nuestra data"""
     name = 'e_indicators'
-    start_urls = 
-    
-"""    start_urls = [
-        'https://www.exito.com/multicooker-11-en-1-digital-6l-479689/p',
-        'https://www.exito.com/olla-arrocera-inox-con-vaporer-finlandek-fi75078-397450/p',
-        'https://www.exito.com/olla-apresion-multichef-pro-imusa-ce753856-3039728/p',
-        'https://www.exito.com/olla-multifuncional-blackdecker-5-litros-mc21850-robot-de-cocina-negro-102052616-mp/p',
-        'https://www.exito.com/olla-arroz-gris-20t-630631/p'
-    ]"""
+
+    def stock_list():
+            start_urls = []
+            for i, df in dataframe.iterrows():            
+                start_urls.append(df['URL'])
+            return start_urls
+
+    start_urls = stock_list()
+
 
     custom_settings = {
         'FEED_URI': 'exito.csv',
@@ -36,12 +40,12 @@ class EconomicIndicators(scrapy.Spider):
     def parse(self, response):
         producto = Producto()
 
-        producto['PAIS'] = 'PAIS'
-        producto['CATEGORIA'] = 'CATEGORIA'
-        producto['SUBCATEGORIA'] = 'SUBCATEGORIA'
+        producto['PAIS'] = 'none' # str(df['PAIS'])
+        producto['CATEGORIA'] = 'none' # str(df['CATEGORIA'])
+        producto['SUBCATEGORIA'] = 'none' # str(df['SUBCATEGORIA'])
         producto['WEB_NAME'] = response.xpath('//meta[@property="og:title"]/@content').extract_first()
-        producto['RETAILER'] = 'RETAILER'
-        producto['URL'] = response.xpath('NULL')
+        producto['RETAILER'] = 'none' # str(df['RETAILER'])
+        producto['URL'] = 'none' # str(df['URL'])
         producto['DESCRIPTIONB'] = response.xpath('//meta[@property="og:description"]/@content').extract_first()
         producto['PRICE'] = response.xpath('//meta[@property="product:price:amount"]/@content').extract_first()
         producto['DESCRIPTIONF'] = response.xpath('NULL')
@@ -61,31 +65,3 @@ class EconomicIndicators(scrapy.Spider):
         yield producto
 
 
-''' 
-
-        info = {
-                'nombre': nombre,
-                'valor': valor,
-                'sku': sku,
-                'imagen':imagen,
-                'descripcion':descripcion,
-                'modelo':modelo,
-                'marca':marca,
-                'fecha': datetime.date.today()
-            }
-
-        yield info
-        
-
-        
-   
-        for ind, val in zip(indicators, values):
-            info = {
-                'nombre': ind,
-                'valor': val,
-                'fecha': datetime.date.today()
-            }
-
-            yield info
- '''
-        

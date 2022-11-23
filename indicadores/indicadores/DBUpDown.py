@@ -37,18 +37,16 @@ class GetDataFrame:
 
     @property
     def get_dataframe(self):
-        try:
-            a = eval(os.getenv("executor"))
-            credentials = a[self._credentials]
-            engine = create_engine('postgresql+psycopg2://{}:{}@{}/{}'.format(
-                credentials['user'], credentials['password'], credentials['host'], credentials['database']))
-            query = f'SELECT * from {self._table}'
-            dataframe = pd.read_sql_query(query, engine)
-            if self._column != []:
-                dataframe = dataframe[self._column]
-            return dataframe
-        except Exception as e:
-            print(f'error en get_dataframe() in DataframeController.py: {e}')
+        
+        a = eval(os.getenv("executor"))
+        credentials = a[self._credentials]
+        engine = create_engine('postgresql+psycopg2://{}:{}@{}:{}/{}'.format(credentials['DB_USER'], credentials['DB_PASS'], credentials['DB_IP'], credentials['DB_PORT'], credentials['DB_NAME']))
+        query = f'SELECT * from {self._table}'
+        dataframe = pd.read_sql_query(query, engine)
+        if self._column != []:
+            dataframe = dataframe[self._column]
+        return dataframe
+
 
     @staticmethod
     def get_excel(df, table):
