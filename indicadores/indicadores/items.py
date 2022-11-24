@@ -26,3 +26,4 @@ class Producto(scrapy.Item):
     SEGMENTO2 = scrapy.Field() # 'NULL'
     SEGMENTO3 = scrapy.Field() # 'NULL'
     SEGMENTO5 = scrapy.Field() # 'NULL'
+    MODELO_HITCH = scrapy.Field()

@@ -8,14 +8,13 @@ load_dotenv()
 
 countries = eval(get_countries())
 retailers = eval(get_retailers())
-#dataframe = GetDataFrame('product_homologated','psql_read').get_dataframe # crawling > retail_information -- homologados > product_homologated
-#dataframe.to_csv('product.csv', index=False)
-dataframe = pd.read_csv("product.csv")
+dataframe = GetDataFrame('product_homologated','psql_read').get_dataframe # crawling > retail_information -- homologados > product_homologated
+dataframe.to_csv('product.csv', index=False)
+#dataframe = pd.read_csv("product.csv")
 dataframe = dataframe[dataframe['PAIS'].isin(countries)] # country - PAIS
 dataframe = dataframe[dataframe['RETAILER'].isin(retailers)] # retail - RETAILER
 #for i, df in dataframe.iterrows():
     #print (df['URL'])
-    
 
 class EconomicIndicators(scrapy.Spider):
     """ Spider para obtener nuestra data"""
@@ -23,12 +22,11 @@ class EconomicIndicators(scrapy.Spider):
 
     def stock_list():
             start_urls = []
-            for i, df in dataframe.iterrows():            
+            for i, df in dataframe.iterrows():
                 start_urls.append(df['URL'])
             return start_urls
 
     start_urls = stock_list()
-
 
     custom_settings = {
         'FEED_URI': 'exito.csv',
@@ -60,6 +58,7 @@ class EconomicIndicators(scrapy.Spider):
         producto['SEGMENTO2'] = 'NULL'
         producto['SEGMENTO3'] = 'NULL'
         producto['SEGMENTO5'] = 'NULL'
+        producto['MODELO_HITCH'] = 'none' # str(df['MODELO HITCH'])
         producto['fecha'] = datetime.date.today()
 
         yield producto
