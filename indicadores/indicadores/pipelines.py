@@ -6,6 +6,15 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+
+
+class IndicadoresPipeline:
+    def process_item(self, item, spider):
+        return item
+
+
+
+''' from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 
 
@@ -17,3 +26,4 @@ class IndicadoresPipeline:
             return item
         else:
             raise DropItem(f"Missing price in {item}")
+ '''
